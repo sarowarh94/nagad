@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>পেমেন্ট স্লাইডার</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #5D5CDE;
+      --background-light: #FFFFFF;
+      --background-dark: #181818;
+      --box-color: #17263D; /* Updated box color */
+      --text-light: #333333;
+      --text-dark: #F3F4F6;
+    }
+    
+    body {
+      background-color: var(--background-light);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+      font-family: 'Hind Siliguri', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    body.dark {
+      background-color: var(--background-dark);
+      color: var(--text-dark);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-family: 'Hind Siliguri', sans-serif;
+      font-weight: 600;
+    }
+    
+    .carousel-container {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: var(--box-color);
+      aspect-ratio: 3/4;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    body.dark .carousel-container {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    .carousel-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      border-radius: 16px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    
+    .carousel-image.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+    
+    button:hover {
+      background-color: #4b4ab8;
+    }
+    
+    button:active {
+      transform: translateY(1px);
+    }
+    
+    .indicators {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #D1D5DB;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+    
+    .indicator.active {
+      background-color: var(--primary-color);
+      transform: scale(1.2);
+    }
+    
+    body.dark .indicator {
+      background-color: #4B5563;
+    }
+    
+    .number-box {
+      display: flex;
+      justify-content: space-between; /* Align numbers to the left and button to the right */
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--primary-color);
+      border-radius: 8px;
+      background-color: #17263D; /* Dark blue background */
+      color: white; /* Explicit white text color for better visibility in both modes */
+      width: 100%;
+      font-size: 20px;
+      font-weight: bold;
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+
+    .copy-button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+
+    .copy-message {
+      display: none;
+      font-weight: bold;
+      color: green;
+      animation: fadeOut 1s forwards;
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 10px 0;
+      }
+      
+      .header h1 {
+        font-size: 20px;
+      }
+      
+      button {
+        padding: 10px 18px;
+        font-size: 15px;
+      }
+      
+      .number-box {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>নগদ মাধ্যম</h1>
+    </div>
+    
+    <div class="carousel-container">
+      <img class="carousel-image active" src="https://pfst.cf2.poecdn.net/base/image/2fc3fe2bdd29e9242978cc959b08b435768159b81c9e63a77859a2e733442c5e?w=6362&h=8191" alt="নগদ পেমেন্ট ১" draggable="false">
+      <img class="carousel-image" src="https://pfst.cf2.poecdn.net/base/image/413670c2efa7f9f1b47ee94d7f2cedbb8e68f6b08771f44a735398895b28a2be?w=6362&h=8191" alt="নগদ পেমেন্ট ২" draggable="false">
+    </div>
+    
+    <div class="controls">
+      <div class="nav-buttons">
+        <button onclick="prevImage()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+          আগের
+        </button>
+        <button onclick="nextImage()">
+          পরের
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+      <div class="indicators" id="indicators"></div>
+    </div>
+    
+    <div class="number-box" id="number-box">
+      <span id="image-number">01609540761</span>
+      <button class="copy-button" id="copy-button" onclick="copyNumber('01609540761')">কপি করুন</button>
+    </div>
+
+    <div class="copy-message" id="copy-message">কপি করা হয়েছে!</div>
+  </div>
+
+  <script>
+    // Check for dark mode preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark');
+    }
+    
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+      if (event.matches) {
+        document.body.classList.add('dark');
+      } else {
+        document.body.classList.remove('dark');
+      }
+    });
+    
+    // Image management
+    const images = document.querySelectorAll('.carousel-image');
+    const indicatorsContainer = document.getElementById('indicators');
+    let currentIndex = 0;
+    
+    // Create indicators
+    for (let i = 0; i < images.length; i++) {
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator' + (i === currentIndex ? ' active' : '');
+      indicator.onclick = function() {
+        showImage(i);
+      };
+      indicatorsContainer.appendChild(indicator);
+    }
+    
+    function showImage(index) {
+      // Hide all images
+      images.forEach(img => {
+        img.classList.remove('active');
+      });
+      
+      // Show the selected image
+      images[index].classList.add('active');
+      
+      // Update indicators
+      const indicators = document.querySelectorAll('.indicator');
+      indicators.forEach((indicator, i) => {
+        if (i === index) {
+          indicator.classList.add('active');
+        } else {
+          indicator.classList.remove('active');
+        }
+      });
+
+      // Update the displayed number and copy option
+      currentIndex = index;
+      const numberToDisplay = currentIndex === 0 ? '01609540761' : '01742711018';
+      document.getElementById('image-number').innerText = numberToDisplay;
+      document.getElementById('copy-button').setAttribute('onclick', `copyNumber('${numberToDisplay}')`);
+    }
+    
+    function prevImage() {
+      const newIndex = (currentIndex - 1 + images.length) % images.length;
+      showImage(newIndex);
+    }
+    
+    function nextImage() {
+      const newIndex = (currentIndex + 1) % images.length;
+      showImage(newIndex);
+    }
+    
+    function copyNumber(number) {
+      navigator.clipboard.writeText(number).then(() => {
+        const message = document.getElementById('copy-message');
+        message.style.display = 'block';
+        setTimeout(() => {
+          message.style.display = 'none';
+        }, 2000);
+      });
+    }
+    
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') {
+        prevImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      }
+    });
+
+    // Prevent right-click on the entire page
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      return false;
+    });
+    
+    // Detect and prevent keyboard shortcuts for screenshots and printing
+    document.addEventListener('keydown', function(e) {
+      // Prevent print screen (PrtScn)
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        return false;
+      }
+      
+      // Prevent Ctrl+P (Print)
+      if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        return false;
+      }
+      
+      // Prevent Ctrl+S (Save)
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    // Function to show alert when page visibility changes (potential screenshot)
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') {
+        // This can sometimes indicate a screenshot attempt on some devices
+      }
+    });
+  </script>
+</body>
+</html>
